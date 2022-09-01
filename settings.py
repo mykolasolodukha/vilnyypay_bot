@@ -1,11 +1,12 @@
 """The module for the settings of the application."""
-from pydantic import BaseSettings
+import pydantic
 
 
-class Settings(BaseSettings):
+class Settings(pydantic.BaseSettings):
     """Settings for the Telegram bot."""
 
     TELEGRAM_BOT_TOKEN: str
+    DATABASE_URL: pydantic.PostgresDsn
 
     class Config:
         """Configuration for the settings."""

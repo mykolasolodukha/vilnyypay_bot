@@ -10,6 +10,8 @@ aiogram = "^2.22.1"
 emoji = "^2.0.0"
 pydantic = {extras = ["dotenv"], version = "^1.10.1"}
 loguru = "^0.6.0"
+tortoise-orm = {extras = ["asyncpg"], version = "^0.19.2"}
+aerich = "^0.6.3"
 
 [tool.poetry.dev-dependencies]
 black = "^22.8.0"
@@ -28,6 +30,11 @@ profile = "black"
 line_length = 100
 filter_files = true
 force_alphabetical_sort_within_sections = true
+
+[tool.aerich]
+tortoise_orm = "utils.tortoise_orm.TORTOISE_ORM_CONFIG"
+location = "./migrations"
+src_folder = "./."
 
 [build-system]
 requires = ["poetry-core>=1.0.0"]
