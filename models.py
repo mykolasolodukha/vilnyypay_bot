@@ -48,6 +48,7 @@ class User(BaseModel):
     is_staff_member = fields.BooleanField(default=False)
 
     messages: fields.ReverseRelation[Message]
+    profile: fields.BackwardOneToOneRelation[Profile]
 
     @property
     def full_name(self):
@@ -72,6 +73,18 @@ class Message(BaseModel):
     text = fields.TextField(null=True)
 
     date = fields.DatetimeField()
+
+
+# endregion
+
+
+# region Profile models
+class Profile(BaseModel):
+    """The model for the user's profile."""
+
+    user: fields.OneToOneRelation[User] = fields.OneToOneField("bot.User", related_name="profile")
+
+    full_name = fields.TextField()
 
 
 # endregion
