@@ -3,7 +3,7 @@ import aiogram
 
 from settings import settings
 from utils import tortoise_orm
-from utils.logging import logger
+from utils.loguru_logging import logger
 from utils.redis_storage import redis_storage
 
 bot = aiogram.Bot(settings.TELEGRAM_BOT_TOKEN)
