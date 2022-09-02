@@ -88,3 +88,18 @@ class Profile(BaseModel):
 
 
 # endregion
+
+
+class Group(BaseModel):
+    """The model for the group of users."""
+
+    name = fields.TextField()
+    uid = fields.CharField(max_length=4, unique=True)
+
+    users: fields.ManyToManyRelation[User] = fields.ManyToManyField(
+        "bot.User", related_name="groups"
+    )
+
+    created_by_user: fields.ForeignKeyRelation[User] = fields.ForeignKeyField(
+        "bot.User", related_name="created_groups"
+    )
