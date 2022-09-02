@@ -48,7 +48,12 @@ class User(BaseModel):
     is_staff_member = fields.BooleanField(default=False)
 
     messages: fields.ReverseRelation[Message]
+
     profile: fields.BackwardOneToOneRelation[Profile]
+
+    groups: fields.ManyToManyRelation[Group]
+
+    created_groups: fields.ReverseRelation[Group]
 
     @property
     def full_name(self):

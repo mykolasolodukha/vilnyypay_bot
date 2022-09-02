@@ -10,6 +10,8 @@ class Settings(pydantic.BaseSettings):
     DATABASE_URL: pydantic.PostgresDsn
     REDIS_URL: pydantic.RedisDsn
 
+    ADMIN_ID: int | None = None
+
     class Config:
         """Configuration for the settings."""
 

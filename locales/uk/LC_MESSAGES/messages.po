@@ -7,7 +7,7 @@ msgstr ""
 "Project-Id-Version: VilnyyPay Bot\n"
 "Language: uk\n"
 
-#: main.py:50
+#: main.py:72
 msgid "start.welcome"
 msgstr "Хей :waving_hand_medium-light_skin_tone:\n"
 "Я твій VILNYY бот! \n"
@@ -17,5 +17,56 @@ msgstr "Хей :waving_hand_medium-light_skin_tone:\n"
 ":red_triangle_pointed_up:\n"
 "Якщо забуватимеш, то нагадуватиму :winking_face:\n"
 "\n"
-"Зараз, попрошу тебе внести свою контактну інформацію:"
+"Зараз, попрошу тебе надіслати свій номер телефону, натиснувши відповідну кнопку знизу."
+
+#: main.py:77
+msgid "start.button.share_phone_number"
+msgstr "Надіслати номер телефону"
+
+#: main.py:95
+msgid "registration.phone_number.already_set"
+msgstr "Ти додав номер телефону раніше."
+
+#: main.py:100
+msgid "registration.phone_number.not_from_user"
+msgstr "Помилка. Необхідно надіслати контакт, використовуючи кнопку знизу. Спробуй, будь ласка, ще раз."
+
+#: main.py:108
+msgid "registration.share_full_name"
+msgstr "Надішли своє ім'я"
+
+#: main.py:135
+msgid "registration.confirm_coliving"
+msgstr "Приємно познайомитися, {user__profile__full_name}!\n"
+"Ти з колівінгу \"{group__name}\", правильно?"
+
+#: main.py:147 main.py:179
+msgid "yes"
+msgstr "Так"
+
+#: main.py:148 main.py:217
+msgid "no"
+msgstr "Ні"
+
+#: main.py:193 main.py:245
+msgid "registration.complete"
+msgstr "Чудово! \n"
+"Тебе успішно зареєстровано. Згодом пришлю тобі подальшу інформацію про наступну оплату)"
+
+#: main.py:220
+msgid "registration.enter_coliving_name"
+msgstr "Хм :face_with_monocle:\n"
+"Щось пішло не так. Вкажи, будь ласка, адресу свого колівінгу. "
+
+#: main.py:224
+msgid "no_such_option"
+msgstr "Відсутній такий варіант. Спробуй, будь-ласка, ще раз."
+
+#: main.py:157 main.py:210
+msgid "registration.group_not_found"
+msgstr "Помилка: групу під номером {group_uid_to_add_to} не знайдено."
+
+#: main.py:167
+msgid "registration.group_uuid_not_found"
+msgstr "Помилка: запрошення в групу не знайдено."
 
