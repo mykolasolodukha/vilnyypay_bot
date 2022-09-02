@@ -1,0 +1,21 @@
+msgid ""
+msgstr ""
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Generator: POEditor.com\n"
+"Project-Id-Version: VilnyyPay Bot\n"
+"Language: uk\n"
+
+#: main.py:50
+msgid "start.welcome"
+msgstr "Хей :waving_hand_medium-light_skin_tone:\n"
+"Я твій VILNYY бот! \n"
+"Буду допомагати тобі з оплатою за колівінг. \n"
+"\n"
+"Кожного нового місяця я надсилатиму тобі суму, дедлайн та посилання для зручної оплати. \n"
+":red_triangle_pointed_up:\n"
+"Якщо забуватимеш, то нагадуватиму :winking_face:\n"
+"\n"
+"Зараз, попрошу тебе внести свою контактну інформацію:"
+

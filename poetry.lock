@@ -540,7 +540,7 @@ multidict = ">=4.0"
 [metadata]
 lock-version = "1.1"
 python-versions = "^3.10"
-content-hash = "08f78779b322ab2c553d9bd6b6f8c6be1145c0544f8e1ca9c487cb643e1c93ad"
+content-hash = "bb9f88f8052df1bb890d3743632d6db3b55e2a0beb93b52841bce7c9844f0a0b"
 
 [metadata.files]
 aerich = [

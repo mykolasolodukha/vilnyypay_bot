@@ -6,7 +6,7 @@ authors = ["Mykola Solodukha <mykola.soloduha@gmail.com>"]
 
 [tool.poetry.dependencies]
 python = "^3.10"
-aiogram = "^2.22.1"
+aiogram = {extras = ["i18n"], version = "^2.22.1"}
 emoji = "^2.0.0"
 pydantic = {extras = ["dotenv"], version = "^1.10.1"}
 loguru = "^0.6.0"
