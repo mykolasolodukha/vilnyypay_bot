@@ -1,8 +1,8 @@
 """The middleware to log all the incoming messages into the database."""
-import typing
 
 from aiogram import types
 from aiogram.dispatcher.middlewares import BaseMiddleware
+from arrow import arrow
 
 from models import Message, User
 from utils.loguru_logging import logger
@@ -28,7 +28,10 @@ class MessagesLoggingMiddleware(BaseMiddleware):
                     f"with {user.start_payload=}"
                 )
             else:
-                await user.update_from_dict(msg.from_user.to_python()).save()
+                # Update the user once a day
+                if user.date_updated < arrow.Arrow.utcnow().shift(days=-1).datetime:
+                    await user.update_from_dict(msg.from_user.to_python()).save()
+                    logger.debug(f"User [ID:{user.pk}] updated")
 
         except Exception as e:
             logger.error(f"Exception in {self.__class__.__name__}: {e} ({e.__class__}")
