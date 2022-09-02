@@ -12,6 +12,8 @@ pydantic = {extras = ["dotenv"], version = "^1.10.1"}
 loguru = "^0.6.0"
 tortoise-orm = {extras = ["asyncpg"], version = "^0.19.2"}
 aerich = "^0.6.3"
+aioredis = "^2.0.1"
+dj-redis-url = "^0.1.4"
 
 [tool.poetry.dev-dependencies]
 black = "^22.8.0"

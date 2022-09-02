@@ -6,7 +6,9 @@ class Settings(pydantic.BaseSettings):
     """Settings for the Telegram bot."""
 
     TELEGRAM_BOT_TOKEN: str
+
     DATABASE_URL: pydantic.PostgresDsn
+    REDIS_URL: pydantic.RedisDsn
 
     class Config:
         """Configuration for the settings."""
