@@ -14,6 +14,7 @@ tortoise-orm = {extras = ["asyncpg"], version = "^0.19.2"}
 aerich = "^0.6.3"
 aioredis = "^2.0.1"
 dj-redis-url = "^0.1.4"
+arrow = "^1.2.2"
 
 [tool.poetry.dev-dependencies]
 black = "^22.8.0"
