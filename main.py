@@ -248,6 +248,29 @@ async def registration_save_coliving_name(
 # endregion
 
 
+# region Admin commands
+@dp.message_handler(commands=["groups_stats"], state=aiogram.filters.state.any_state)
+async def groups_stats(message: aiogram.types.Message, user: User):
+    """Show the statistics of the groups."""
+    logger.debug(f"Received the command: {message.text=}")
+
+    if not user.is_admin:
+        return await message.answer(emoji.emojize(_("no_permission")))
+
+    if not (groups := await Group.all()):
+        return await message.answer(emoji.emojize(_("no_groups")))
+
+    stats = [
+        f"<b>{group.name:<10}</b> ({group.uid}): <b>{await group.users.all().count()}</b> users"
+        for group in groups
+    ]
+
+    return await message.answer(
+        "".join([f"<b>Groups stats</b>:\n\n", "\n".join(stats)]),
+        parse_mode=aiogram.types.ParseMode.HTML,
+    )
+
+
 # region Startup and shutdown callbacks
 async def on_startup(*_, **__):
     """Startup the bot."""
