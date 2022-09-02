@@ -2,7 +2,7 @@
 
 import ssl
 
-from tortoise import expand_db_url, Tortoise
+import tortoise
 
 from settings import settings
 
@@ -13,7 +13,7 @@ def get_tortoise_config():
     ctx.check_hostname = False
     ctx.verify_mode = ssl.CERT_NONE
 
-    db = expand_db_url(settings.DATABASE_URL)
+    db = tortoise.expand_db_url(settings.DATABASE_URL)
     db["credentials"]["ssl"] = ctx
 
     tortoise_config = {
@@ -34,15 +34,41 @@ def get_tortoise_config():
 async def init():
     """Initialize the `tortoise-orm`."""
     # Init database connection
-    await Tortoise.init(config=get_tortoise_config())
+    await tortoise.Tortoise.init(config=get_tortoise_config())
     # Generate the schema
-    await Tortoise.generate_schemas()
+    await tortoise.Tortoise.generate_schemas()
 
 
 async def shutdown():
     """Shutdown the `tortoise-orm`."""
-    await Tortoise.close_connections()
+    await tortoise.Tortoise.close_connections()
 
 
 # Used by aerich.ini
 TORTOISE_ORM_CONFIG = get_tortoise_config()
+
+
+def flatten_tortoise_model(
+    model: tortoise.Model, separator: str | None = ".", prefix: str | None = None
+) -> dict:
+    """Flatten a `tortoise-orm` `Model` to a dictionary with a given separator in the keys."""
+    flattened_dict: dict = {}
+    for key, value in model.__dict__.items():
+        if isinstance(value, tortoise.Model):
+            flattened_dict.update(
+                **flatten_tortoise_model(
+                    value,
+                    separator=separator,
+                    prefix=f"{key.removeprefix('_')}{separator}",
+                )
+            )
+        # Do not return internal properties of the `Model`
+        elif key.startswith("_"):
+            pass
+        else:
+            flattened_dict.setdefault(key, value)
+
+    if prefix:
+        flattened_dict = {f"{prefix}{k}": v for k, v in flattened_dict.items()}
+
+    return dict(sorted(flattened_dict.items(), key=lambda x: x[0]))  # always return the same result
