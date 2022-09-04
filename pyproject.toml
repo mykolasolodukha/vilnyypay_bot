@@ -15,6 +15,7 @@ aerich = "^0.6.3"
 aioredis = "^2.0.1"
 dj-redis-url = "^0.1.4"
 arrow = "^1.2.2"
+stringcase = "^1.2.0"
 
 [tool.poetry.dev-dependencies]
 black = "^22.8.0"

@@ -1,10 +1,40 @@
 """The `tortoise-orm` configuration module."""
 
 import ssl
+import typing
 
+import stringcase
 import tortoise
 
 from settings import settings
+
+
+class ModelMeta(tortoise.ModelMeta):
+    """
+    Metaclass for `tortoise-orm` `Model`.
+
+    We set the correct default DB table name in here.
+    """
+
+    def __new__(mcs, name, bases, attrs):
+        """Create a new `Model` class."""
+        new_class: typing.Type[tortoise.Model] = super().__new__(mcs, name, bases, attrs)
+
+        if name != "Model":
+            # Cache the `._meta` attribute
+            # noinspection PyProtectedMember
+            meta = new_class._meta
+
+            if not meta.db_table:
+                meta.db_table = stringcase.snakecase(name)
+
+        return new_class
+
+
+class Model(tortoise.Model, metaclass=ModelMeta):
+    """The base `tortoise-orm` `Model`."""
+
+    pass
 
 
 def get_tortoise_config():

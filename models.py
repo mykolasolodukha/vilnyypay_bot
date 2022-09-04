@@ -2,10 +2,12 @@
 
 from __future__ import annotations
 
-from tortoise import fields, models
+from tortoise import fields
+
+from utils.tortoise_orm import Model
 
 
-class BaseModel(models.Model):
+class BaseModel(Model):
     """The base model for all models."""
 
     date_added = fields.DatetimeField(auto_now_add=True)
@@ -102,7 +104,7 @@ class Group(BaseModel):
     uid = fields.CharField(max_length=4, unique=True)
 
     users: fields.ManyToManyRelation[User] = fields.ManyToManyField(
-        "bot.User", related_name="groups"
+        "bot.User", through="group__user", related_name="groups"
     )
 
     created_by_user: fields.ForeignKeyRelation[User] = fields.ForeignKeyField(

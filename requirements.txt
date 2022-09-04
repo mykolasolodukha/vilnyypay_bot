@@ -325,6 +325,8 @@ pytz==2022.2.1; python_version >= "3.7" and python_version < "4.0" and (python_v
 six==1.16.0; python_version >= "3.6" and python_full_version < "3.0.0" or python_full_version >= "3.3.0" and python_version >= "3.6" \
     --hash=sha256:8abb2f1d86890a2dfb989f9a77cfcfd3e47c2a354b01111771326f8aa26e0254 \
     --hash=sha256:1e61c37477a1626458e36f7b1d82aa5c9b094fa4802892072e49de9c60c4c926
+stringcase==1.2.0 \
+    --hash=sha256:48a06980661908efe8d9d34eab2b6c13aefa2163b3ced26972902e3bdfd87008
 tomlkit==0.11.4; python_version >= "3.7" and python_version < "4.0" \
     --hash=sha256:25d4e2e446c453be6360c67ddfb88838cfc42026322770ba13d1fbd403a93a5c \
     --hash=sha256:3235a9010fae54323e727c3ac06fb720752fe6635b3426e379daec60fbd44a83
