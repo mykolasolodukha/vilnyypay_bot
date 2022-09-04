@@ -2,6 +2,9 @@
 
 from __future__ import annotations
 
+import typing
+import uuid
+
 from tortoise import fields
 
 from utils.tortoise_orm import Model
@@ -55,6 +58,9 @@ class User(BaseModel):
 
     groups: fields.ManyToManyRelation[Group]
 
+    received_paychecks: fields.ReverseRelation[Paycheck]
+
+    monobank_client: fields.BackwardOneToOneRelation[MonobankClient]
     created_groups: fields.ReverseRelation[Group]
 
     @property
@@ -110,3 +116,128 @@ class Group(BaseModel):
     created_by_user: fields.ForeignKeyRelation[User] = fields.ForeignKeyField(
         "bot.User", related_name="created_groups"
     )
+
+
+# region Monobank models
+class MonobankClient(BaseModel):
+    """The model for the Monobank client."""
+
+    user: fields.OneToOneRelation[User] = fields.OneToOneField(
+        "bot.User", related_name="monobank_client"
+    )
+
+    token = fields.TextField()
+
+    client_id = fields.TextField(null=True)
+    name = fields.TextField(null=True)
+    web_hook_url = fields.TextField(null=True)
+    permissions = fields.CharField(max_length=4)
+
+    monobank_accounts: fields.ReverseRelation[MonobankAccount]
+
+
+class MonobankAccount(BaseModel):
+    """The model for the Monobank account."""
+
+    monobank_client: fields.ForeignKeyRelation[MonobankClient] = fields.ForeignKeyField(
+        "bot.MonobankClient", related_name="monobank_accounts"
+    )
+
+    id = fields.CharField(max_length=22, pk=True)
+    send_id = fields.CharField(max_length=10, null=True)
+    currency_code = fields.SmallIntField()
+    cashback_type = fields.CharField(max_length=255)
+    balance = fields.BigIntField()
+    credit_limit = fields.BigIntField()
+    masked_pan = fields.CharField(max_length=16, null=True)
+    type: typing.Literal[
+        "black", "white", "platinum", "iron", "fop", "yellow", "eAid"
+    ] = fields.CharField(max_length=16)
+    iban = fields.CharField(max_length=29)
+
+    account_statements: fields.ReverseRelation[MonobankAccountStatement]
+
+    paychecks: fields.ReverseRelation[Paycheck]
+
+    def __str__(self):
+        """
+        Get the human-readable representation of the account.
+
+        NB: In case of a "fop" account, the masked PAN is unavailable, so we use the IBAN instead.
+        """
+        return f"{self.masked_pan or self.iban} ({self.balance / 100} {self.currency_code})"
+
+
+class MonobankAccountStatement(BaseModel):
+    """The model for the Monobank account statement."""
+
+    monobank_account: fields.ForeignKeyRelation[MonobankAccount] = fields.ForeignKeyField(
+        "bot.MonobankAccount", related_name="account_statements"
+    )
+
+    id = fields.CharField(max_length=16, pk=True)
+    time = fields.DatetimeField()
+
+    description = fields.TextField()
+    comment = fields.TextField(null=True, default=None)
+
+    mcc = fields.IntField()
+    original_mcc = fields.IntField()
+
+    amount = fields.IntField()
+    operation_amount = fields.IntField()
+    currency_code = fields.IntField()
+    commission_rate = fields.IntField()
+    cashback_amount = fields.IntField()
+
+    balance = fields.IntField()
+
+    hold = fields.BooleanField()
+
+    receipt_id = fields.CharField(max_length=255, null=True, default=None)
+    invoice_id = fields.CharField(max_length=255, null=True, default=None)
+
+    # The following fields exist only if `MonobankAccount.type == "fop"`
+    counterEdrpou = fields.CharField(max_length=255, null=True, default=None)
+    counterIban = fields.CharField(max_length=255, null=True, default=None)
+
+    # The `paycheck` field would be populated after an `AccountStatement` matched with a `Paycheck`,
+    # basically meaning that "this particular `AccountStatement`(-s) is a result of someone paying
+    # this particular `Paycheck`"
+    paycheck: fields.ForeignKeyNullableRelation[Paycheck] = fields.ForeignKeyField(
+        "bot.Paycheck", related_name="paid_account_statements", null=True, default=None
+    )
+
+
+# endregion
+
+
+# region Payments models
+class Paycheck(BaseModel):
+    """
+    The model for the paycheck.
+
+    A Paycheck is at the core of the bot's functionality. It is created for a user and then , after
+    the user has paid it, matched with the corresponding account statements.
+    """
+
+    for_user: fields.ForeignKeyRelation[User] = fields.ForeignKeyField(
+        "bot.User", related_name="received_paychecks"
+    )
+    to_account: fields.ForeignKeyRelation[MonobankAccount] = fields.ForeignKeyField(
+        "bot.MonobankAccount", related_name="paychecks", on_delete=fields.SET_NULL, null=True
+    )
+
+    id = fields.UUIDField(pk=True, default=uuid.uuid4)
+    comment = fields.TextField()
+
+    amount = fields.IntField()
+    currency_symbol = fields.CharField(max_length=3)
+    currency_code = fields.SmallIntField()
+
+    is_paid = fields.BooleanField(default=False)
+
+    paid_account_statements: fields.ReverseRelation[MonobankAccountStatement]
+
+
+# endregion
