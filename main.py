@@ -266,7 +266,7 @@ async def groups_stats(message: aiogram.types.Message, user: User):
     ]
 
     return await message.answer(
-        "".join([f"<b>Groups stats</b>:\n\n", "\n".join(stats)]),
+        "".join([f"<b>Groups stats</b>\n\n", "<pre>", "\n".join(stats), "</pre>"]),
         parse_mode=aiogram.types.ParseMode.HTML,
     )
 
