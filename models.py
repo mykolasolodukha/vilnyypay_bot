@@ -57,6 +57,7 @@ class User(BaseModel):
     profile: fields.BackwardOneToOneRelation[Profile]
 
     groups: fields.ManyToManyRelation[Group]
+    admin_in_groups: fields.ManyToManyRelation[Group]
 
     received_paychecks: fields.ReverseRelation[Paycheck]
 
@@ -111,6 +112,9 @@ class Group(BaseModel):
 
     users: fields.ManyToManyRelation[User] = fields.ManyToManyField(
         "bot.User", through="group__user", related_name="groups"
+    )
+    admins: fields.ManyToManyRelation[User] = fields.ManyToManyField(
+        "bot.User", through="group__admin", related_name="admin_in_groups"
     )
 
     created_by_user: fields.ForeignKeyRelation[User] = fields.ForeignKeyField(
