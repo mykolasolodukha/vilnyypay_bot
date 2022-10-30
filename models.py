@@ -58,6 +58,7 @@ class User(BaseModel):
 
     groups: fields.ManyToManyRelation[Group]
     admin_in_groups: fields.ManyToManyRelation[Group]
+    created_group_payments: fields.ReverseRelation[GroupPayment]
 
     received_paychecks: fields.ReverseRelation[Paycheck]
 
@@ -120,6 +121,7 @@ class Group(BaseModel):
     created_by_user: fields.ForeignKeyRelation[User] = fields.ForeignKeyField(
         "bot.User", related_name="created_groups"
     )
+    payments: fields.ReverseRelation[GroupPayment]
 
 
 # region Monobank models
@@ -240,8 +242,36 @@ class Paycheck(BaseModel):
     currency_code = fields.SmallIntField()
 
     is_paid = fields.BooleanField(default=False)
+    generated_from_group_payment: fields.ForeignKeyNullableRelation[
+        GroupPayment
+    ] = fields.ForeignKeyField(
+        "bot.GroupPayment", related_name="generated_paychecks", null=True, default=None
+    )
 
     paid_account_statements: fields.ReverseRelation[MonobankAccountStatement]
+
+
+class GroupPayment(BaseModel):
+    """
+    The model for the group payment.
+
+    This allows saving the group payments to the database, generating `Paycheck`s, and keeping
+    track of them after.
+    """
+
+    group: fields.ForeignKeyRelation[Group] = fields.ForeignKeyField(
+        "bot.Group", related_name="payments"
+    )
+
+    amount = fields.IntField()
+    comment = fields.TextField()  # TODO: [10/19/2022 by Mykola] Allow nullable comments
+    due_date = fields.DatetimeField()
+
+    creator: fields.ForeignKeyRelation[User] = fields.ForeignKeyField(
+        "bot.User", related_name="created_group_payments"
+    )
+
+    generated_paychecks: fields.ReverseRelation[Paycheck]
 
 
 # endregion

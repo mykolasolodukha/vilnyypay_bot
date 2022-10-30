@@ -10,3 +10,12 @@ class Registration(StatesGroup):
     share_full_name = State()
     confirm_coliving = State()
     enter_coliving_name = State()
+
+
+class CreatePayment(StatesGroup):
+    """The states that a user can be in during the payment creation process."""
+
+    enter_group = State()
+    enter_amount = State()
+    enter_comment = State()
+    enter_due_date = State()

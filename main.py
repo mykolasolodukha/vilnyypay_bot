@@ -1,6 +1,7 @@
 """The main module of the application."""
 
 import aiogram
+import arrow
 import emoji
 from aiogram.contrib.middlewares.i18n import I18nMiddleware
 from aiogram.contrib.middlewares.logging import LoggingMiddleware
@@ -10,7 +11,7 @@ from aiogram.dispatcher.filters.state import any_state
 import states
 from filters.auth import AuthFilter
 from middlewares.message_logging_middleware import MessagesLoggingMiddleware
-from models import Group, Profile, User
+from models import Group, GroupPayment, Profile, User
 from settings import settings
 from utils import tortoise_orm
 from utils.loguru_logging import logger
@@ -269,6 +270,152 @@ async def groups_stats(message: aiogram.types.Message, user: User):
         "".join([f"<b>Groups stats</b>\n\n", "<pre>", "\n".join(stats), "</pre>"]),
         parse_mode=aiogram.types.ParseMode.HTML,
     )
+
+
+@dp.message_handler(commands=["create_group_payment"], state=aiogram.filters.state.any_state)
+async def create_group_payment(message: aiogram.types.Message, user: User):
+    """Create a payment for the group."""
+    logger.debug(f"Received the command: {message.text=}")
+
+    # TODO: [10/16/2022 by Mykola] Make a decorator for the admin commands.
+    if not user.is_admin:
+        return await message.answer(emoji.emojize(_("no_permission")))
+
+    if not (groups := await Group.filter(admins__id=user.id)):
+        return await message.answer(emoji.emojize(_("no_groups")))
+
+    await states.CreatePayment.enter_group.set()
+
+    return await message.answer(
+        emoji.emojize(_("admin.create_group_payment.enter_group")),
+        reply_markup=aiogram.types.ReplyKeyboardMarkup(
+            resize_keyboard=True, one_time_keyboard=True
+        ).add(
+            *(
+                # TODO: [10/19/2022 by Mykola] Make them more distinct in the keyboard.
+                aiogram.types.KeyboardButton(group.name)
+                for group in groups
+            ),
+        ),
+    )
+
+
+@dp.message_handler(
+    state=states.CreatePayment.enter_group, content_types=aiogram.types.ContentType.TEXT
+)
+async def create_group_payment_enter_group(
+    message: aiogram.types.Message, state: aiogram.dispatcher.FSMContext, user: User
+):
+    """Save the group name and ask for the payment amount."""
+    logger.debug(f"Received the group name: {message.text=}")
+
+    if not (group := await Group.filter(admins__id=user.id, name=message.text).first()):
+        return await message.answer(emoji.emojize(_("no_such_group")))
+
+    await state.update_data(group_payment__group_id=group.pk)
+
+    await states.CreatePayment.enter_amount.set()
+
+    return await message.answer(
+        # NB: The `amount` must be specified in the smallest currency unit.
+        emoji.emojize(_("admin.create_group_payment.enter_amount")),
+        reply_markup=aiogram.types.ReplyKeyboardRemove(),
+    )
+
+
+@dp.message_handler(
+    state=states.CreatePayment.enter_amount, content_types=aiogram.types.ContentType.TEXT
+)
+async def create_group_payment_enter_amount(
+    message: aiogram.types.Message, state: aiogram.dispatcher.FSMContext, user: User
+):
+    """Save the payment amount and ask for the payment comment."""
+    logger.debug(f"Received the payment amount: {message.text=}")
+
+    try:
+        amount = int(message.text)
+    except ValueError:
+        return await message.answer(emoji.emojize(_("admin.create_group_payment.invalid_amount")))
+
+    if amount <= 0:
+        return await message.answer(emoji.emojize(_("admin.create_group_payment.invalid_amount")))
+
+    await state.update_data(group_payment__amount=amount)
+
+    await states.CreatePayment.enter_comment.set()
+
+    return await message.answer(
+        emoji.emojize(_("admin.create_group_payment.enter_comment")),
+        reply_markup=aiogram.types.ReplyKeyboardRemove(),
+    )
+
+
+@dp.message_handler(
+    state=states.CreatePayment.enter_comment, content_types=aiogram.types.ContentType.TEXT
+)
+async def create_group_payment_enter_comment(
+    message: aiogram.types.Message, state: aiogram.dispatcher.FSMContext, user: User
+):
+    """Save the payment comment and ask for the payment's due date."""
+    logger.debug(f"Received the payment comment: {message.text=}")
+
+    await state.update_data(group_payment__comment=message.text)
+
+    await states.CreatePayment.enter_due_date.set()
+
+    return await message.answer(
+        # NB: The `due_date` must be specified in the format `DD.MM.YYYY` or `DD MM YYYY`.
+        emoji.emojize(_("admin.create_group_payment.enter_due_date")),
+        reply_markup=aiogram.types.ReplyKeyboardRemove(),
+    )
+
+
+@dp.message_handler(
+    state=states.CreatePayment.enter_due_date, content_types=aiogram.types.ContentType.TEXT
+)
+async def create_group_payment_enter_due_date(
+    message: aiogram.types.Message, state: aiogram.dispatcher.FSMContext, user: User
+):
+    """Save the payment's due date and create a `models.GroupPayment`."""
+    logger.debug(f"Received the payment's due date: {message.text=}")
+
+    try:
+        due_date = arrow.get(message.text.replace(" ", "."), "DD.MM.YYYY").date()
+    except ValueError:
+        return await message.answer(emoji.emojize(_("admin.create_group_payment.invalid_due_date")))
+
+    if due_date < arrow.now().date():
+        # TODO: [10/19/2022 by Mykola] What if a payment is due today?
+        return await message.answer(emoji.emojize(_("admin.create_group_payment.invalid_due_date")))
+
+    await state.update_data(group_payment__due_date=due_date.isoformat())
+
+    user_state_data = await state.get_data()
+
+    group_payment_data = {
+        key.removeprefix("group_payment__"): value
+        for key, value in user_state_data.items()
+        if key.startswith("group_payment__")
+    }
+
+    group_payment = await GroupPayment.create(**group_payment_data, creator=user)
+
+    await state.finish()
+
+    # TODO: [10/30/2022 by Mykola] [Possibly] trigger a mass-sending of the `group_payment` to users
+
+    # noinspection StrFormat
+    return await message.answer(
+        emoji.emojize(
+            _("admin.create_group_payment.success").format(
+                **flatten_tortoise_model(group_payment, separator="__", prefix="group_payment__")
+            )
+        ),
+        reply_markup=aiogram.types.ReplyKeyboardRemove(),
+    )
+
+
+# endregion
 
 
 # region Startup and shutdown callbacks
