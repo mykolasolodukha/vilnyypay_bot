@@ -13,6 +13,7 @@ from filters.auth import AuthFilter
 from middlewares.message_logging_middleware import MessagesLoggingMiddleware
 from models import Group, GroupPayment, Profile, User
 from settings import settings
+from tasks import send_group_payment
 from utils import tortoise_orm
 from utils.loguru_logging import logger
 from utils.redis_storage import redis_storage
@@ -402,7 +403,8 @@ async def create_group_payment_enter_due_date(
 
     await state.finish()
 
-    # TODO: [10/30/2022 by Mykola] [Possibly] trigger a mass-sending of the `group_payment` to users
+    # TODO: [11/1/2022 by Mykola] Do this in a separate worker.
+    await send_group_payment(group_payment.pk)
 
     # noinspection StrFormat
     return await message.answer(

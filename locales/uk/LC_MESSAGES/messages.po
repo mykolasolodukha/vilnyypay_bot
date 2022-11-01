@@ -7,7 +7,7 @@ msgstr ""
 "Project-Id-Version: VilnyyPay Bot\n"
 "Language: uk\n"
 
-#: main.py:72
+#: main.py:74
 msgid "start.welcome"
 msgstr "Хей :waving_hand_medium-light_skin_tone:\n"
 "Я твій VILNYY бот! \n"
@@ -19,54 +19,116 @@ msgstr "Хей :waving_hand_medium-light_skin_tone:\n"
 "\n"
 "Зараз, попрошу тебе надіслати свій номер телефону, натиснувши відповідну кнопку знизу."
 
-#: main.py:77
+#: main.py:79
 msgid "start.button.share_phone_number"
 msgstr "Надіслати номер телефону"
 
-#: main.py:95
+#: main.py:97
 msgid "registration.phone_number.already_set"
 msgstr "Ти додав номер телефону раніше."
 
-#: main.py:100
+#: main.py:102
 msgid "registration.phone_number.not_from_user"
 msgstr "Помилка. Необхідно надіслати контакт, використовуючи кнопку знизу. Спробуй, будь ласка, ще раз."
 
-#: main.py:108
+#: main.py:110
 msgid "registration.share_full_name"
 msgstr "Надішли своє ім'я"
 
-#: main.py:135
+#: main.py:137
 msgid "registration.confirm_coliving"
 msgstr "Приємно познайомитися, {user__profile__full_name}!\n"
 "Ти з колівінгу \"{group__name}\", правильно?"
 
-#: main.py:147 main.py:179
+#: main.py:149 main.py:181
 msgid "yes"
 msgstr "Так"
 
-#: main.py:148 main.py:217
+#: main.py:150 main.py:219
 msgid "no"
 msgstr "Ні"
 
-#: main.py:193 main.py:245
+#: main.py:195 main.py:247
 msgid "registration.complete"
 msgstr "Чудово! \n"
 "Тебе успішно зареєстровано. Згодом пришлю тобі подальшу інформацію про наступну оплату)"
 
-#: main.py:220
+#: main.py:222
 msgid "registration.enter_coliving_name"
 msgstr "Хм :face_with_monocle:\n"
 "Щось пішло не так. Вкажи, будь ласка, адресу свого колівінгу. "
 
-#: main.py:224
+#: main.py:226
 msgid "no_such_option"
 msgstr "Відсутній такий варіант. Спробуй, будь-ласка, ще раз."
 
-#: main.py:157 main.py:210
+#: main.py:159 main.py:212
 msgid "registration.group_not_found"
 msgstr "Помилка: групу під номером {group_uid_to_add_to} не знайдено."
 
-#: main.py:167
+#: main.py:169
 msgid "registration.group_uuid_not_found"
 msgstr "Помилка: запрошення в групу не знайдено."
+
+#: main.py:260 main.py:283
+msgid "no_permission"
+msgstr "Немає доступу."
+
+#: main.py:263 main.py:286
+msgid "no_groups"
+msgstr "Немає доступних груп."
+
+#: main.py:291
+msgid "admin.create_group_payment.enter_group"
+msgstr "Обери групу."
+
+#: main.py:314
+msgid "no_such_group"
+msgstr "Такої групи не знайдено."
+
+#: main.py:322
+msgid "admin.create_group_payment.enter_amount"
+msgstr "Введи суму платежу В КОПІЙКАХ!"
+
+#: main.py:339 main.py:342
+msgid "admin.create_group_payment.invalid_amount"
+msgstr "Некоректна сума платежу. Спробуй ще раз."
+
+#: main.py:349
+msgid "admin.create_group_payment.enter_comment"
+msgstr "Введи коментар до платежу."
+
+#: main.py:369
+msgid "admin.create_group_payment.enter_due_date"
+msgstr "Введи дату, до котрої платіж має бути здійснено (в форматі ДЕНЬ.МІСЯЦЬ.РІК)."
+
+#: main.py:386 main.py:390
+msgid "admin.create_group_payment.invalid_due_date"
+msgstr "Некоректна дата або дата в майбутньому. Спробуй ще раз."
+
+#: main.py:412
+msgid "admin.create_group_payment.success"
+msgstr "Платіж [ID:{group_payment__id}] для групи [ID:{group_payment__group_id}] створено!\n"
+"\n"
+"Сума: {group_payment__amount}\n"
+"Коментар: {group_payment__comment}\n"
+"Кінцева дата оплати: {group_payment__due_date}"
+
+#: tasks.py:75
+msgid "tasks.notification.payment_created"
+msgstr "Привітики!\n"
+"Повідомляю про початок оплати проживання за наступний місяць.\n"
+"\n"
+"💸Сума: <code>{paycheck__amount:.2f}</code> грн.\n"
+"⏰Дедлайн: {paycheck__generated_from_group_payment__due_date}\n"
+"\n"
+"<b>Реквізити для оплати:</b> (натисни на текст щоб його скопіювати)\n"
+"IBAN: <code>{paycheck__for_user__settings__monobank_account_to_pay_to__iban}</code>\n"
+"Призначення: <code>{paycheck__comment} [{paycheck__generated_from_group_payment__group__name}] [{paycheck__id}]</code>\n"
+"\n"
+"Наступні реквізити зазвичай підтягуються автоматично після введення IBAN, але на всякий:\n"
+"Отримувач: <code>ФОП Каленченко Леся Іванівна</code>\n"
+"ЄДРПОУ: <code>2785306464</code>\n"
+"\n"
+"Гарного тобі дня!"
 
