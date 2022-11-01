@@ -12,6 +12,8 @@ class Settings(pydantic.BaseSettings):
 
     ADMIN_ID: int | None = None
 
+    TIMEZONE: str = "Europe/Kiev"
+
     class Config:
         """Configuration for the settings."""
 
