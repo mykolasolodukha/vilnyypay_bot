@@ -55,6 +55,7 @@ class User(BaseModel):
     messages: fields.ReverseRelation[Message]
 
     profile: fields.BackwardOneToOneRelation[Profile]
+    settings: fields.BackwardOneToOneRelation[Settings]
 
     groups: fields.ManyToManyRelation[Group]
     admin_in_groups: fields.ManyToManyRelation[Group]
@@ -93,13 +94,23 @@ class Message(BaseModel):
 # endregion
 
 
-# region Profile models
+# region User-related models
 class Profile(BaseModel):
     """The model for the user's profile."""
 
     user: fields.OneToOneRelation[User] = fields.OneToOneField("bot.User", related_name="profile")
 
     full_name = fields.TextField()
+
+
+class Settings(BaseModel):
+    """The model for the user's settings."""
+
+    user: fields.OneToOneRelation[User] = fields.OneToOneField("bot.User", related_name="settings")
+
+    monobank_account_to_pay_to: fields.ForeignKeyRelation[MonobankAccount] = fields.ForeignKeyField(
+        "bot.MonobankAccount", related_name="paying_users_settings", null=True
+    )
 
 
 # endregion
@@ -111,6 +122,7 @@ class Group(BaseModel):
     name = fields.TextField()
     uid = fields.CharField(max_length=4, unique=True)
 
+    # TODO: [10/27/2022 by Mykola] Rename `.users` to `.members`
     users: fields.ManyToManyRelation[User] = fields.ManyToManyField(
         "bot.User", through="group__user", related_name="groups"
     )
@@ -162,6 +174,8 @@ class MonobankAccount(BaseModel):
     iban = fields.CharField(max_length=29)
 
     account_statements: fields.ReverseRelation[MonobankAccountStatement]
+
+    paying_users_settings: fields.ReverseRelation[Settings]
 
     paychecks: fields.ReverseRelation[Paycheck]
 
