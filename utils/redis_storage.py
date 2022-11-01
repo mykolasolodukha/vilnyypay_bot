@@ -10,7 +10,7 @@ from aiogram.contrib.fsm_storage.redis import RedisStorage2
 
 from settings import settings
 
-redis_config: dict = dj_redis_url.config(default=settings.REDIS_URL.fragment)
+redis_config: dict = dj_redis_url.config(default=settings.REDIS_URL)
 
 
 def parse_config(config_to_parse: dict[str, typing.Any]) -> dict[str, typing.Any]:
