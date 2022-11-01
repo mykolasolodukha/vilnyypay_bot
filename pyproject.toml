@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "vilnyypay_bot"
-version = "0.2.4"
+version = "0.3.0"
 description = "A bot for managing payments for a network of Vilnyy co-livings."
 authors = ["Mykola Solodukha <mykola.soloduha@gmail.com>"]
 
