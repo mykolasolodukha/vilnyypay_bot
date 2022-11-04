@@ -118,14 +118,13 @@ async def registration_save_phone_number(message: aiogram.types.Message, user: U
 async def registration_save_first_name(
     message: aiogram.types.Message, state: FSMContext, user: User
 ):
-    """Create a user's profile and save the first name of the user."""
+    """Save the first name of the user."""
     logger.debug(f"Received first name: {message.text=}")
 
-    if not (user_profile := await user.profile):
-        user_profile = await Profile.create(user=user, first_name=message.text)
-        logger.debug(f"Created a new profile for the user: {user_profile.pk=}")
-    else:
-        logger.warning(f"User already has a profile: {user_profile.pk=}, {user.pk=}")
+    # Get user's profile and set the first name
+    profile = await user.profile
+    profile.first_name = message.text
+    await profile.save()
 
     await states.Registration.share_last_name.set()
 

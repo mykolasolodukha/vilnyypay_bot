@@ -5,6 +5,7 @@ from __future__ import annotations
 import typing
 import uuid
 
+import tortoise.signals
 from tortoise import fields
 
 from utils.tortoise_orm import Model
@@ -75,6 +76,19 @@ class User(BaseModel):
         return f"{self.first_name} {self.last_name}"
 
 
+@tortoise.signals.post_save(User)
+async def create_profile_and_settings(
+    sender: typing.Type[User], instance: User, created: bool, *_, **__
+):
+    """Create a profile and settings for the user."""
+    if created:
+        await Profile.create(user=instance)
+        await Settings.create(
+            user=instance,
+            monobank_account_to_pay_to=await MonobankAccount.all().order_by("date_added").first(),
+        )
+
+
 class Message(BaseModel):
     """The model for the Telegram message."""
 
@@ -100,7 +114,7 @@ class Profile(BaseModel):
 
     user: fields.OneToOneRelation[User] = fields.OneToOneField("bot.User", related_name="profile")
 
-    first_name = fields.TextField()
+    first_name = fields.TextField(null=True)
     last_name = fields.TextField(null=True)
 
 
