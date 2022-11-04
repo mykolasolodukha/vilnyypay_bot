@@ -31,82 +31,78 @@ msgstr "Ти додав номер телефону раніше."
 msgid "registration.phone_number.not_from_user"
 msgstr "Помилка. Необхідно надіслати контакт, використовуючи кнопку знизу. Спробуй, будь ласка, ще раз."
 
-#: main.py:110
-msgid "registration.share_full_name"
-msgstr "Надішли своє ім'я"
-
-#: main.py:137
+#: main.py:161
 msgid "registration.confirm_coliving"
-msgstr "Приємно познайомитися, {user__profile__full_name}!\n"
+msgstr "Приємно познайомитися, {user__profile__first_name}!\n"
 "Ти з колівінгу \"{group__name}\", правильно?"
 
-#: main.py:149 main.py:181
+#: main.py:173 main.py:205
 msgid "yes"
 msgstr "Так"
 
-#: main.py:150 main.py:219
+#: main.py:174 main.py:243
 msgid "no"
 msgstr "Ні"
 
-#: main.py:195 main.py:247
+#: main.py:219 main.py:271
 msgid "registration.complete"
 msgstr "Чудово! \n"
 "Тебе успішно зареєстровано. Згодом пришлю тобі подальшу інформацію про наступну оплату)"
 
-#: main.py:222
+#: main.py:246
 msgid "registration.enter_coliving_name"
 msgstr "Хм :face_with_monocle:\n"
 "Щось пішло не так. Вкажи, будь ласка, адресу свого колівінгу. "
 
-#: main.py:226
+#: main.py:250
 msgid "no_such_option"
 msgstr "Відсутній такий варіант. Спробуй, будь-ласка, ще раз."
 
-#: main.py:159 main.py:212
+#: main.py:183 main.py:236
 msgid "registration.group_not_found"
 msgstr "Помилка: групу під номером {group_uid_to_add_to} не знайдено."
 
-#: main.py:169
+#: main.py:193
 msgid "registration.group_uuid_not_found"
 msgstr "Помилка: запрошення в групу не знайдено."
 
-#: main.py:260 main.py:283
+#: main.py:284 main.py:307
 msgid "no_permission"
 msgstr "Немає доступу."
 
-#: main.py:263 main.py:286
+#: main.py:287 main.py:310
 msgid "no_groups"
 msgstr "Немає доступних груп."
 
-#: main.py:291
+#: main.py:315
 msgid "admin.create_group_payment.enter_group"
 msgstr "Обери групу."
 
-#: main.py:314
+#: main.py:338
 msgid "no_such_group"
 msgstr "Такої групи не знайдено."
 
-#: main.py:322
+#: main.py:346
 msgid "admin.create_group_payment.enter_amount"
 msgstr "Введи суму платежу В КОПІЙКАХ!"
 
-#: main.py:339 main.py:342
+#: main.py:363 main.py:366
 msgid "admin.create_group_payment.invalid_amount"
 msgstr "Некоректна сума платежу. Спробуй ще раз."
 
-#: main.py:349
+#: main.py:373
 msgid "admin.create_group_payment.enter_comment"
 msgstr "Введи коментар до платежу."
 
-#: main.py:369
+#: main.py:393
 msgid "admin.create_group_payment.enter_due_date"
 msgstr "Введи дату, до котрої платіж має бути здійснено (в форматі ДЕНЬ.МІСЯЦЬ.РІК)."
 
-#: main.py:386 main.py:390
+#: main.py:410 main.py:414
 msgid "admin.create_group_payment.invalid_due_date"
 msgstr "Некоректна дата або дата в майбутньому. Спробуй ще раз."
 
-#: main.py:412
+#: main.py:436
 msgid "admin.create_group_payment.success"
 msgstr "Платіж [ID:{group_payment__id}] для групи [ID:{group_payment__group_id}] створено!\n"
 "\n"
@@ -114,7 +110,7 @@ msgstr "Платіж [ID:{group_payment__id}] для групи [ID:{group_payme
 "Коментар: {group_payment__comment}\n"
 "Кінцева дата оплати: {group_payment__due_date}"
 
-#: tasks.py:75
+#: tasks.py:63
 msgid "tasks.notification.payment_created"
 msgstr "Привітики!\n"
 "Повідомляю про початок оплати проживання за наступний місяць.\n"
@@ -131,4 +127,16 @@ msgstr "Привітики!\n"
 "ЄДРПОУ: <code>2785306464</code>\n"
 "\n"
 "Гарного тобі дня!"
+
+#: main.py:110
+msgid "registration.share_first_name"
+msgstr "Надішли своє ім'я"
+
+#: main.py:133
+msgid "registration.share_last_name"
+msgstr "Надішли своє прізвище"
+
+#: main.py:149
+msgid "registration.error"
+msgstr "Помилка при реєстрації"
 

@@ -104,28 +104,52 @@ async def registration_save_phone_number(message: aiogram.types.Message, user: U
     user.phone_number = message.contact.phone_number
     await user.save()
 
-    await states.Registration.share_full_name.set()
+    await states.Registration.share_first_name.set()
 
     return await message.answer(
-        emoji.emojize(_("registration.share_full_name")),
+        emoji.emojize(_("registration.share_first_name")),
         reply_markup=aiogram.types.ReplyKeyboardRemove(),
     )
 
 
 @dp.message_handler(
-    state=states.Registration.share_full_name, content_types=aiogram.types.ContentType.TEXT
+    state=states.Registration.share_first_name, content_types=aiogram.types.ContentType.TEXT
 )
-async def registration_save_full_name(
+async def registration_save_first_name(
     message: aiogram.types.Message, state: FSMContext, user: User
 ):
-    """Create a user's profile and save the full name of the user."""
-    logger.debug(f"Received full name: {message.text=}")
+    """Create a user's profile and save the first name of the user."""
+    logger.debug(f"Received first name: {message.text=}")
 
     if not (user_profile := await user.profile):
-        user_profile = await Profile.create(user=user, full_name=message.text)
+        user_profile = await Profile.create(user=user, first_name=message.text)
         logger.debug(f"Created a new profile for the user: {user_profile.pk=}")
     else:
         logger.warning(f"User already has a profile: {user_profile.pk=}, {user.pk=}")
+
+    await states.Registration.share_last_name.set()
+
+    return await message.answer(
+        emoji.emojize(_("registration.share_last_name")),
+        reply_markup=aiogram.types.ReplyKeyboardRemove(),
+    )
+
+
+@dp.message_handler(
+    state=states.Registration.share_last_name, content_types=aiogram.types.ContentType.TEXT
+)
+async def registration_save_last_name(
+    message: aiogram.types.Message, state: FSMContext, user: User
+):
+    """Save the last name of the user."""
+    logger.debug(f"Received last name: {message.text=}")
+
+    if not (user_profile := await user.profile):
+        logger.error(f"User doesn't have a profile: {user.pk=}")
+        return await message.answer(emoji.emojize(_("registration.error")))
+
+    user_profile.last_name = message.text
+    await user_profile.save()
 
     if group_uid_to_add_to := (await state.get_data()).get("group_uid_to_add_to"):
         if group := await Group.get_or_none(uid=group_uid_to_add_to):

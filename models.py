@@ -100,7 +100,8 @@ class Profile(BaseModel):
 
     user: fields.OneToOneRelation[User] = fields.OneToOneField("bot.User", related_name="profile")
 
-    full_name = fields.TextField()
+    first_name = fields.TextField()
+    last_name = fields.TextField(null=True)
 
 
 class Settings(BaseModel):
