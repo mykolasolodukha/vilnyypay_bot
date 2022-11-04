@@ -10,7 +10,6 @@ from models import GroupPayment, Paycheck, User
 from settings import settings
 from utils.tortoise_orm import flatten_tortoise_model
 
-
 # noinspection StrFormat
 PAYMENT_FORMATTERS: dict[str, typing.Callable[[int | datetime.datetime], str | int]] = {
     "paycheck__amount": lambda amount: amount / 100,

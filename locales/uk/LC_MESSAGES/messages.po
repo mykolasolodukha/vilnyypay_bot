@@ -84,7 +84,7 @@ msgstr "Такої групи не знайдено."
 
 #: main.py:346
 msgid "admin.create_group_payment.enter_amount"
-msgstr "Введи суму платежу В КОПІЙКАХ!"
+msgstr "Введи суму платежу, наприклад \"3800\" або \"23.50\""
 
 #: main.py:363 main.py:366
 msgid "admin.create_group_payment.invalid_amount"

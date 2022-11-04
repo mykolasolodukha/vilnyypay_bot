@@ -357,13 +357,25 @@ async def create_group_payment_enter_amount(
     """Save the payment amount and ask for the payment comment."""
     logger.debug(f"Received the payment amount: {message.text=}")
 
-    try:
-        amount = int(message.text)
-    except ValueError:
-        return await message.answer(emoji.emojize(_("admin.create_group_payment.invalid_amount")))
+    if message.text.isdigit():
+        amount = int(message.text) * 100
+    else:
+        try:
+            amount_major_units, amount_minor_units = (int(part) for part in message.text.split("."))
+        except ValueError:
+            return await message.answer(
+                emoji.emojize(_("admin.create_group_payment.invalid_amount"))
+            )
 
-    if amount <= 0:
-        return await message.answer(emoji.emojize(_("admin.create_group_payment.invalid_amount")))
+        if (amount_major_units <= 0 and amount_minor_units <= 0) or len(
+            str(amount_minor_units)
+        ) != 2:
+            return await message.answer(
+                emoji.emojize(_("admin.create_group_payment.invalid_amount"))
+            )
+
+        # FIXME: [11/4/2022 by Mykola] The `f"{amount_major_units:02}"` doesn't work here.
+        amount = int(f"{amount_major_units}{amount_minor_units:02}")
 
     await state.update_data(group_payment__amount=amount)
 
