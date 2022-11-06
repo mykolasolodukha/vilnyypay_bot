@@ -1,0 +1,10 @@
+-- upgrade --
+ALTER TABLE "monobank_account"
+    ADD "name" TEXT;
+ALTER TABLE "monobank_account"
+    ADD "edrpou" VARCHAR(10);
+-- downgrade --
+ALTER TABLE "monobank_account"
+    DROP COLUMN "name";
+ALTER TABLE "monobank_account"
+    DROP COLUMN "edrpou";

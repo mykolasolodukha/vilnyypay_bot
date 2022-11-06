@@ -176,6 +176,7 @@ class MonobankAccount(BaseModel):
         "bot.MonobankClient", related_name="monobank_accounts"
     )
 
+    # Monobank properties
     id = fields.CharField(max_length=22, pk=True)
     send_id = fields.CharField(max_length=10, null=True)
     currency_code = fields.SmallIntField()
@@ -187,6 +188,10 @@ class MonobankAccount(BaseModel):
         "black", "white", "platinum", "iron", "fop", "yellow", "eAid"
     ] = fields.CharField(max_length=16)
     iban = fields.CharField(max_length=29)
+
+    # Custom properties, used to generate payment links
+    name = fields.TextField(null=True)
+    edrpou = fields.CharField(max_length=10, null=True)
 
     account_statements: fields.ReverseRelation[MonobankAccountStatement]
 
