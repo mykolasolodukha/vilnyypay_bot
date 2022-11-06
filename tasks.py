@@ -134,5 +134,8 @@ async def send_group_payment(group_payment_id: int) -> None:
 
     # Send the group payment to the group users
     for user in await (await group_payment.group).users.all():
+        if await Paycheck.exists(generated_from_group_payment=group_payment, for_user=user):
+            continue
+
         paycheck: Paycheck = await _generate_paycheck_for_user(group_payment, user)
         await _send_paycheck_to_user(paycheck)
