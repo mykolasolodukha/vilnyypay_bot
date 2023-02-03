@@ -122,7 +122,7 @@ msgstr "Надішли своє прізвище"
 msgid "registration.error"
 msgstr "Помилка при реєстрації"
 
-#: tasks.py:101
+#: tasks.py:131
 msgid "tasks.notifications.payment_created.message"
 msgstr "Привітики!\n"
 "Повідомляю про початок оплати проживання за наступний місяць.\n"
@@ -140,7 +140,12 @@ msgstr "Привітики!\n"
 "\n"
 "Гарного тобі дня!"
 
-#: tasks.py:106
+#: tasks.py:139
 msgid "tasks.notifications.payment_created.pay_button"
 msgstr ":credit_card: Оплатити за посиланням"
+
+#: tasks.py:185
+msgid "tasks.notifications.payment_received.message"
+msgstr "Ми отримали твою оплату ❤️\n"
+"Бережи себе і насолоджуйся життям на колівінгу!"
 

@@ -1,7 +1,11 @@
 """All the asynchronous tasks are defined here."""
+import asyncio
 import base64
 import datetime
+import random
+import re
 import typing
+from uuid import UUID
 
 import aiogram
 import aiogram.utils.exceptions
@@ -9,10 +13,11 @@ import arrow
 import babel
 import emoji
 
-from models import GroupPayment, Paycheck, User
+from models import GroupPayment, MonobankAccount, MonobankAccountStatement, Paycheck, User
 from settings import settings
 from utils.i18n import custom_gettext as _
 from utils.loguru_logging import logger
+from utils.monobank import pull_all_account_statements
 from utils.tortoise_orm import flatten_tortoise_model
 
 # noinspection StrFormat
@@ -90,16 +95,11 @@ async def _generate_paycheck_for_user(group_payment: GroupPayment, user: User) -
     )
 
 
-async def _send_paycheck_to_user(paycheck: Paycheck) -> None:
-    """Send a paycheck to the user."""
-    from main import bot
-
+async def _get_payment_template_data(paycheck: Paycheck) -> dict[str, typing.Any]:
+    """Get the data for the payment template."""
     await paycheck.fetch_related(
         "for_user__settings__monobank_account_to_pay_to", "generated_from_group_payment__group"
     )
-
-    user: User = paycheck.for_user
-    _user_locale = babel.core.Locale.parse(user.language_code, sep="-")
 
     payment_template_data = {
         key: formatter(value) if (formatter := PAYMENT_FORMATTERS.get(key)) else value
@@ -107,6 +107,18 @@ async def _send_paycheck_to_user(paycheck: Paycheck) -> None:
             paycheck, separator="__", prefix="paycheck__"
         ).items()
     }
+
+    return payment_template_data
+
+
+async def _send_paycheck_to_user(paycheck: Paycheck) -> None:
+    """Send a paycheck to the user."""
+    from main import bot
+
+    payment_template_data = await _get_payment_template_data(paycheck)
+
+    user: User = paycheck.for_user
+    _user_locale = babel.core.Locale.parse(user.language_code, sep="-")
 
     try:
         # noinspection StrFormat
@@ -147,3 +159,84 @@ async def send_group_payment(group_payment_id: int) -> None:
 
         paycheck: Paycheck = await _generate_paycheck_for_user(group_payment, user)
         await _send_paycheck_to_user(paycheck)
+
+
+async def send_payment_received_message(paycheck_id: UUID) -> aiogram.types.Message:
+    """Send a message to the user that the payment has been received."""
+    from main import bot
+
+    paycheck = await Paycheck.get(id=paycheck_id)
+
+    payment_template_data = await _get_payment_template_data(paycheck)
+
+    user: User = paycheck.for_user
+    _user_locale = babel.core.Locale.parse(user.language_code, sep="-")
+
+    # noinspection StrFormat
+    return await bot.send_message(
+        user.id,
+        emoji.emojize(
+            _("tasks.notifications.payment_received.message", _user_locale).format(
+                **payment_template_data
+            )
+        ),
+        parse_mode=aiogram.types.ParseMode.HTML,
+    )
+
+
+async def process_new_account_statement(account_statement: MonobankAccountStatement) -> None:
+    """
+    Process new account statement.
+
+    Also, make the `Paycheck.is_paid` field `True` if the statement meets the requirements.
+    """
+    # Check if there is a UUID in the `account_statement.description`
+    uuid_in_square_brackets_pattern: re.Pattern = re.compile(
+        r"\[(?P<uuid>[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12})\]"
+    )
+    match: re.Match | None = uuid_in_square_brackets_pattern.search(account_statement.comment)
+    if not match:
+        logger.error(
+            f"Received a statement without a UUID in the comment: {account_statement.comment=}"
+        )
+
+    # Get the `Paycheck` by the UUID
+    paycheck: Paycheck = await Paycheck.get(id=UUID(match.group("uuid")))
+
+    # Check if the `Paycheck` is already paid
+    if paycheck.is_paid:
+        logger.error(f"Paycheck {paycheck.id=} is already paid")
+        return
+
+    # Set the `Paycheck.is_paid` field to `True`
+    paycheck.is_paid = True
+    await paycheck.save()
+
+    # Send a message to the user that the payment has been received
+    await send_payment_received_message(paycheck.id)
+
+
+async def monitor_paychecks() -> None:
+    """Monitor the paychecks."""
+    # NB: This _might not_ work when there are multiple `MonobankAccount`s and/or multiple
+    #  `MonobankClient`s processing at once, for multiple reasons:
+    #  1. The "429 Too Many Requests" error might be raised by Monobank API
+    #  2. Monobank might consider this a non-private usage of their API
+    #   (one must apply for a commercial access).
+
+    while True:
+        # Pull all account statements from Monobank for all the `MonobankAccount`s
+        await asyncio.gather(
+            *(
+                pull_all_account_statements(
+                    monobank_account.id,
+                    new_account_statement_callback=process_new_account_statement,
+                )
+                # for monobank_account in await MonobankAccount.all()
+                # TODO: [2/3/2023 by Mykola] Make it work for multiple `MonobankAccount`s
+                for monobank_account in [await MonobankAccount.all().order_by("date_added").first()]
+            )
+        )
+
+        # Sleep for a random time between 1 and 2 minutes
+        await asyncio.sleep(random.randint(60, 60 * 2))
