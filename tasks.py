@@ -59,7 +59,7 @@ async def generate_link_from_paycheck(paycheck: Paycheck) -> str:
     _comment = paycheck.comment
 
     # TODO: [11/6/2022 by Mykola] Remove the need to do multiple fetches
-    await paycheck.fetch_related("generated_from_group_payment__group")
+    await paycheck.fetch_related("generated_from_group_payment__group", "to_account")
     if paycheck.generated_from_group_payment:
         _comment += f" [{paycheck.generated_from_group_payment.group.name}]"
 
