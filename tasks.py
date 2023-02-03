@@ -4,6 +4,7 @@ import datetime
 import typing
 
 import aiogram
+import aiogram.utils.exceptions
 import arrow
 import babel
 import emoji
@@ -11,6 +12,7 @@ import emoji
 from models import GroupPayment, Paycheck, User
 from settings import settings
 from utils.i18n import custom_gettext as _
+from utils.loguru_logging import logger
 from utils.tortoise_orm import flatten_tortoise_model
 
 # noinspection StrFormat
@@ -106,25 +108,32 @@ async def _send_paycheck_to_user(paycheck: Paycheck) -> None:
         ).items()
     }
 
-    # noinspection StrFormat
-    await bot.send_message(
-        user.id,
-        emoji.emojize(
-            # FIXME: [11/6/2022 by Mykola] This might not work with `pybabel extract`
-            _("tasks.notifications.payment_created.message", _user_locale).format(
-                **payment_template_data
-            )
-        ),
-        reply_markup=aiogram.types.InlineKeyboardMarkup().add(
-            aiogram.types.InlineKeyboardButton(
-                text=emoji.emojize(
-                    _("tasks.notifications.payment_created.pay_button", _user_locale)
-                ),
-                url=await generate_link_from_paycheck(paycheck),
-            )
-        ),
-        parse_mode=aiogram.types.ParseMode.HTML,
-    )
+    try:
+        # noinspection StrFormat
+        await bot.send_message(
+            user.id,
+            emoji.emojize(
+                # FIXME: [11/6/2022 by Mykola] This might not work with `pybabel extract`
+                _("tasks.notifications.payment_created.message", _user_locale).format(
+                    **payment_template_data
+                )
+            ),
+            reply_markup=aiogram.types.InlineKeyboardMarkup().add(
+                aiogram.types.InlineKeyboardButton(
+                    text=emoji.emojize(
+                        _("tasks.notifications.payment_created.pay_button", _user_locale)
+                    ),
+                    url=await generate_link_from_paycheck(paycheck),
+                )
+            ),
+            parse_mode=aiogram.types.ParseMode.HTML,
+        )
+    except aiogram.utils.exceptions.BotBlocked:
+        logger.info(f"Bot blocked by the {user.id=} ({user.username=})")
+
+        logger.debug(f"Setting {user.id=} ({user.username=}) as inactive...")
+        user.is_active = False
+        await user.save(update_fields=["is_active"])
 
 
 async def send_group_payment(group_payment_id: int) -> None:
