@@ -24,9 +24,7 @@ PAYMENT_FORMATTERS: dict[str, typing.Callable[[int | datetime.datetime], str | i
 }
 
 
-def _generate_payment_link(
-    receiver: str, iban: str, amount: int, edrpou: str, comment: str
-) -> str:
+def _generate_payment_link(receiver: str, iban: str, amount: int, edrpou: str, comment: str) -> str:
     """
     Generate a payment link.
 
@@ -36,7 +34,7 @@ def _generate_payment_link(
         (
             f"BCD\n"  # service code
             f"002\n"  # version
-            f"2\n"  # encoding: 1 - Windows-1251, 2 - UTF-8
+            f"2\n"  # encoding: 1 - UTF-8, 2 - Windows-1251
             f"UCT\n"  # function code: UTC for "Ukrainian Credit Transfer"
             f"\n"  # BIC: Bank Identifier Code (not used)
             f"{receiver}\n"  # receiver name
@@ -46,10 +44,11 @@ def _generate_payment_link(
             f"\n"  # RFU (not used, reserved for future use)
             f"\n"  # Reference to RFU (not used, reserved for future use)
             f"{comment}\n"  # comment
-        ).encode("utf-8")
+        ).encode("windows-1251")
     )
 
-    return f"https://bank.gov.ua/qr/{base64_data.decode('utf-8')}"
+    qr_data = base64_data.decode("utf-8").replace("+", "-").replace("/", "_").replace("=", "")
+    return f"https://bank.gov.ua/qr/{qr_data}"
 
 
 async def generate_link_from_paycheck(paycheck: Paycheck) -> str:
