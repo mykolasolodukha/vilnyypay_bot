@@ -301,7 +301,7 @@ class GroupPayment(BaseModel):
     comment = fields.TextField()  # TODO: [10/19/2022 by Mykola] Allow nullable comments
     due_date = fields.DatetimeField()
 
-    creator: fields.ForeignKeyRelation[User] = fields.ForeignKeyField(
+    created_by: fields.ForeignKeyRelation[User] = fields.ForeignKeyField(
         "bot.User", related_name="created_group_payments"
     )
 

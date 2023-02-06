@@ -434,7 +434,7 @@ async def create_group_payment_enter_due_date(
         if key.startswith("group_payment__")
     }
 
-    group_payment = await GroupPayment.create(**group_payment_data, creator=user)
+    group_payment = await GroupPayment.create(**group_payment_data, created_by=user)
 
     await state.finish()
 
