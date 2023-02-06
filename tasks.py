@@ -210,6 +210,14 @@ async def process_new_account_statement(account_statement: MonobankAccountStatem
         logger.error(f"Paycheck {paycheck.id=} is already paid")
         return
 
+    # Check that the `account_statement.amount` is equal to the `paycheck.amount`
+    if account_statement.amount != paycheck.amount:
+        logger.error(
+            f"Received a statement with an incorrect amount: {account_statement.amount=}, "
+            f"expected: {paycheck.amount=}"
+        )
+        return
+
     # Set the `Paycheck.is_paid` field to `True`
     paycheck.is_paid = True
     await paycheck.save()
