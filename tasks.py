@@ -199,6 +199,8 @@ async def process_new_account_statement(account_statement: MonobankAccountStatem
         logger.error(
             f"Received a statement without a UUID in the comment: {account_statement.comment=}"
         )
+        # TODO: [2/6/2023 by Mykola] Notify admins about this
+        return
 
     # Get the `Paycheck` by the UUID
     paycheck: Paycheck = await Paycheck.get(id=UUID(match.group("uuid")))
