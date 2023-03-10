@@ -1,4 +1,5 @@
 """The main module of the application."""
+import functools
 
 import aiogram
 import arrow
@@ -41,8 +42,8 @@ dp.middleware.setup(MessagesLoggingMiddleware())
 
 i18n = I18nMiddleware("messages", default="uk")
 dp.middleware.setup(i18n)
-_ = i18n.gettext
-__ = i18n.lazy_gettext
+_ = functools.partial(i18n.gettext, locale="uk")
+__ = functools.partial(i18n.lazy_gettext, locale="uk")
 
 
 # endregion
