@@ -274,6 +274,129 @@ async def registration_save_coliving_name(
 # endregion
 
 
+# region User settings
+@dp.message_handler(commands=["settings"], state=aiogram.filters.state.any_state)
+async def settings(message: aiogram.types.Message):
+    """Show the settings menu to the user."""
+    logger.debug(f"Received the command: {message.text=}")
+
+    await states.Settings.select_settings_type.set()
+
+    return await message.answer(
+        emoji.emojize(_("settings")),
+        reply_markup=aiogram.types.ReplyKeyboardMarkup(
+            resize_keyboard=True, row_width=1, one_time_keyboard=True
+        ).add(
+            aiogram.types.KeyboardButton(_("settings.groups")),
+            aiogram.types.KeyboardButton(_("settings.profile")),
+            aiogram.types.KeyboardButton(_("settings.primary_bank_account")),
+        ),
+    )
+
+
+# region Groups settings
+
+
+@dp.message_handler(
+    state=states.Settings.select_settings_type,
+    content_types=aiogram.types.ContentType.TEXT,
+    text=__("settings.groups"),
+)
+async def select_group_settings(message: aiogram.types.Message):
+    """Select the group settings type."""
+    logger.debug(f"Received the text: {message.text=}")
+
+    await states.GroupSettings.select_group.set()
+
+    return await message.answer(
+        emoji.emojize(_("settings.select_new_group")),
+        reply_markup=aiogram.types.ReplyKeyboardMarkup(
+            resize_keyboard=True, row_width=3, one_time_keyboard=True
+        ).add(*[aiogram.types.KeyboardButton(group.name) for group in await Group.all()]),
+    )
+
+
+@dp.message_handler(
+    state=states.GroupSettings.select_group, content_types=aiogram.types.ContentType.TEXT
+)
+async def select_group(message: aiogram.types.Message, state: FSMContext, user: User):
+    """Select the group."""
+    logger.debug(f"Received the text: {message.text=}")
+
+    if group := await Group.get_or_none(name=message.text):
+        # Remove the user from all the groups and add him to the new one
+        await user.groups.clear()
+        await user.groups.add(group)
+
+        await state.finish()
+
+        # noinspection StrFormat
+        return await message.answer(
+            emoji.emojize(
+                _("settings.group_selected").format(
+                    **flatten_tortoise_model(group, separator="__", prefix="group__")
+                )
+            ),
+            reply_markup=aiogram.types.ReplyKeyboardRemove(),
+        )
+    else:
+        return await message.answer(emoji.emojize(_("settings.group_not_found")))
+
+
+# endregion
+
+
+# region Profile settings
+@dp.message_handler(
+    state=states.Settings.select_settings_type,
+    content_types=aiogram.types.ContentType.TEXT,
+    text=__("settings.profile"),
+)
+async def select_profile_settings(message: aiogram.types.Message, state: FSMContext):
+    """Select the profile settings type."""
+    logger.debug(f"Received the text: {message.text=}")
+
+    # TODO: [3/10/2023 by Mykola] Add Profile settings.
+
+    await state.finish()
+
+    return await message.answer(
+        emoji.emojize(_("settings.not_implemented")),
+        reply_markup=aiogram.types.ReplyKeyboardRemove(),
+    )
+
+
+# endregion
+
+
+# region Primary bank account settings
+
+
+@dp.message_handler(
+    state=states.Settings.select_settings_type,
+    content_types=aiogram.types.ContentType.TEXT,
+    text=__("settings.primary_bank_account"),
+)
+async def select_primary_bank_account_settings(message: aiogram.types.Message, state: FSMContext):
+    """Select the profile settings type."""
+    logger.debug(f"Received the text: {message.text=}")
+
+    # TODO: [3/10/2023 by Mykola] Add Primary bank account settings.
+
+    await state.finish()
+
+    return await message.answer(
+        emoji.emojize(_("settings.not_implemented")),
+        reply_markup=aiogram.types.ReplyKeyboardRemove(),
+    )
+
+
+# endregion
+
+
+# endregion
+
+
 # region Admin commands
 @dp.message_handler(commands=["groups_stats"], state=aiogram.filters.state.any_state)
 async def groups_stats(message: aiogram.types.Message, user: User):
@@ -457,17 +580,27 @@ async def create_group_payment_enter_due_date(
 
 
 # region Startup and shutdown callbacks
-async def on_startup(*_, **__):
+async def on_startup(*__, **___):
     """Startup the bot."""
     logger.info(f"Starting up the https://t.me/{(await bot.get_me()).username} bot...")
 
     logger.debug("Initializing the database connection...")
     await tortoise_orm.init()
 
+    logger.debug("Setting the bot's commands...")
+    await bot.set_my_commands(
+        [
+            aiogram.types.BotCommand("start", _("bot_command.start")),
+            # TODO: [3/10/2023 by Mykola] Add the `help` command.
+            # aiogram.types.BotCommand("help", _("bot_command.help")),
+            aiogram.types.BotCommand("settings", _("bot_command.settings")),
+        ]
+    )
+
     logger.info("Startup complete.")
 
 
-async def on_shutdown(*_, **__):
+async def on_shutdown(*__, **___):
     """Shutdown the bot."""
     logger.info("Shutting down...")
 

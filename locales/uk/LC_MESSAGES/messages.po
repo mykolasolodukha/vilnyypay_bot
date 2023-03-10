@@ -7,7 +7,7 @@ msgstr ""
 "Project-Id-Version: VilnyyPay Bot\n"
 "Language: uk\n"
 
-#: main.py:74
+#: main.py:75
 msgid "start.welcome"
 msgstr "Хей :waving_hand_medium-light_skin_tone:\n"
 "Я твій VILNYY бот! \n"
@@ -19,90 +19,90 @@ msgstr "Хей :waving_hand_medium-light_skin_tone:\n"
 "\n"
 "Зараз, попрошу тебе надіслати свій номер телефону, натиснувши відповідну кнопку знизу."
 
-#: main.py:79
+#: main.py:80
 msgid "start.button.share_phone_number"
 msgstr "Надіслати номер телефону"
 
-#: main.py:97
+#: main.py:98
 msgid "registration.phone_number.already_set"
 msgstr "Ти додав номер телефону раніше."
 
-#: main.py:102
+#: main.py:103
 msgid "registration.phone_number.not_from_user"
 msgstr "Помилка. Необхідно надіслати контакт, використовуючи кнопку знизу. Спробуй, будь ласка, ще раз."
 
-#: main.py:160
+#: main.py:161
 msgid "registration.confirm_coliving"
 msgstr "Приємно познайомитися, {user__profile__first_name}!\n"
 "Ти з колівінгу \"{group__name}\", правильно?"
 
-#: main.py:172 main.py:204
+#: main.py:173 main.py:205
 msgid "yes"
 msgstr "Так"
 
-#: main.py:173 main.py:242
+#: main.py:174 main.py:243
 msgid "no"
 msgstr "Ні"
 
-#: main.py:218 main.py:270
+#: main.py:219 main.py:271
 msgid "registration.complete"
 msgstr "Чудово! \n"
 "Тебе успішно зареєстровано. Згодом пришлю тобі подальшу інформацію про наступну оплату)"
 
-#: main.py:245
+#: main.py:246
 msgid "registration.enter_coliving_name"
 msgstr "Хм :face_with_monocle:\n"
 "Щось пішло не так. Вкажи, будь ласка, адресу свого колівінгу. "
 
-#: main.py:249
+#: main.py:250
 msgid "no_such_option"
 msgstr "Відсутній такий варіант. Спробуй, будь-ласка, ще раз."
 
-#: main.py:182 main.py:235
+#: main.py:183 main.py:236
 msgid "registration.group_not_found"
 msgstr "Помилка: групу під номером {group_uid_to_add_to} не знайдено."
 
-#: main.py:192
+#: main.py:193
 msgid "registration.group_uuid_not_found"
 msgstr "Помилка: запрошення в групу не знайдено."
 
-#: main.py:283 main.py:306
+#: main.py:401 main.py:424
 msgid "no_permission"
 msgstr "Немає доступу."
 
-#: main.py:286 main.py:309
+#: main.py:404 main.py:427
 msgid "no_groups"
 msgstr "Немає доступних груп."
 
-#: main.py:314
+#: main.py:432
 msgid "admin.create_group_payment.enter_group"
 msgstr "Обери групу."
 
-#: main.py:337
+#: main.py:455
 msgid "no_such_group"
 msgstr "Такої групи не знайдено."
 
-#: main.py:345
+#: main.py:463
 msgid "admin.create_group_payment.enter_amount"
 msgstr "Введи суму платежу, наприклад \"3800\" або \"23.50\""
 
-#: main.py:366 main.py:373
+#: main.py:484 main.py:491
 msgid "admin.create_group_payment.invalid_amount"
 msgstr "Некоректна сума платежу. Спробуй ще раз."
 
-#: main.py:384
+#: main.py:502
 msgid "admin.create_group_payment.enter_comment"
 msgstr "Введи коментар до платежу."
 
-#: main.py:404
+#: main.py:522
 msgid "admin.create_group_payment.enter_due_date"
 msgstr "Введи дату, до котрої платіж має бути здійснено (в форматі ДЕНЬ.МІСЯЦЬ.РІК)."
 
-#: main.py:421 main.py:425
+#: main.py:539 main.py:543
 msgid "admin.create_group_payment.invalid_due_date"
 msgstr "Некоректна дата або дата в майбутньому. Спробуй ще раз."
 
-#: main.py:447
+#: main.py:565
 msgid "admin.create_group_payment.success"
 msgstr "Платіж [ID:{group_payment__id}] для групи [ID:{group_payment__group_id}] створено!\n"
 "\n"
@@ -110,19 +110,19 @@ msgstr "Платіж [ID:{group_payment__id}] для групи [ID:{group_payme
 "Коментар: {group_payment__comment}\n"
 "Кінцева дата оплати: {group_payment__due_date}"
 
-#: main.py:110
+#: main.py:111
 msgid "registration.share_first_name"
 msgstr "Надішли своє ім'я"
 
-#: main.py:132
+#: main.py:133
 msgid "registration.share_last_name"
 msgstr "Надішли своє прізвище"
 
-#: main.py:148
+#: main.py:149
 msgid "registration.error"
 msgstr "Помилка при реєстрації"
 
-#: tasks.py:131
+#: tasks.py:129
 msgid "tasks.notifications.payment_created.message"
 msgstr "Привітики!\n"
 "Повідомляю про початок оплати проживання за наступний місяць.\n"
@@ -135,17 +135,57 @@ msgstr "Привітики!\n"
 "Призначення: <code>{paycheck__comment} [{paycheck__generated_from_group_payment__group__name}] [{paycheck__id}]</code>\n"
 "\n"
 "Наступні реквізити зазвичай підтягуються автоматично після введення IBAN, але на всякий:\n"
-"Отримувач: <code>ФОП Каленченко Леся Іванівна</code>\n"
-"ЄДРПОУ: <code>2785306464</code>\n"
+"Отримувач: <code>{paycheck__for_user__settings__monobank_account_to_pay_to__name}</code>\n"
+"ЄДРПОУ: <code>{paycheck__for_user__settings__monobank_account_to_pay_to__edrpou}</code>\n"
 "\n"
 "Гарного тобі дня!"
 
-#: tasks.py:139
+#: tasks.py:136
 msgid "tasks.notifications.payment_created.pay_button"
 msgstr ":credit_card: Оплатити за посиланням"
 
-#: tasks.py:185
+#: tasks.py:179
 msgid "tasks.notifications.payment_received.message"
 msgstr "Ми отримали твою оплату ❤️\n"
 "Бережи себе і насолоджуйся життям на колівінгу!"
+
+#: main.py:286
+msgid "settings"
+msgstr "⚙️ Обери налаштування, які хочеш змінити"
+
+#: main.py:290
+msgid "settings.groups"
+msgstr "Змінити колівінг"
+
+#: main.py:291
+msgid "settings.profile"
+msgstr "Редагувати профіль"
+
+#: main.py:292
+msgid "settings.primary_bank_account"
+msgstr "Змінити банк для оплат"
+
+#: main.py:310
+msgid "settings.select_new_group"
+msgstr "Обери колівінг, на якому ти зараз проживаєш, використовуючи кнопки знизу 👇"
+
+#: main.py:334
+msgid "settings.group_selected"
+msgstr "Дякуємо, тепер твій колівінг - {group__name}"
+
+#: main.py:340
+msgid "settings.group_not_found"
+msgstr "Такого колівінгу не знайдено 😥"
+
+#: main.py:360 main.py:383
+msgid "settings.not_implemented"
+msgstr "👷 Це меню в режимі розробки"
+
+#: main.py:587
+msgid "bot_command.start"
+msgstr "Запустити бота"
+
+#: main.py:590
+msgid "bot_command.settings"
+msgstr "Змінити свої налаштування"
 
